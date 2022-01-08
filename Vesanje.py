@@ -7,6 +7,7 @@ import bs4
 import requests
 import webbrowser
 
+# Images for hangman mistakes
 prva_greska = Image.open("prva greska.png")
 druga_greska = Image.open("druga greska.png")
 treca_greska = Image.open("treca greska.png")
