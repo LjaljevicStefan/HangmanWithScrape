@@ -241,8 +241,12 @@ if __name__ == "__main__":
         my_font = 'Calibri 20'
     elif len(resenje) < 40:
         my_font = 'Calibri 18'
-    else:
+    elif len(resenje) < 45:
         my_font = 'Calibri 16'
+    elif len(resenje) < 50:
+        my_font = 'Calibri 14'
+    else:
+        my_font = 'Calibri 12'
     my_label = Label(prozor, font = my_font, text = listToStr)
     my_label.place(relx = 0.1, rely = 0.1, anchor = NW, height = 200)
     my_label.configure(bg = "OliveDrab2", highlightthickness = 0, borderwidth = 0)
