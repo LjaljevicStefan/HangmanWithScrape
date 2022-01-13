@@ -1,4 +1,5 @@
 from tkinter import *
+import winsound
 from PIL import Image, ImageTk
 import random
 import sys
@@ -16,10 +17,10 @@ def list_frame(slika):
     frames = [PhotoImage(file=slika,format = 'gif -index %i' %(i)) for i in range(frameCnt)]
     return frames
 
-correct = lambda: PlaySound('correct.wav', SND_FILENAME)
-wrong = lambda: PlaySound('wrong.wav', SND_FILENAME)
-winner = lambda: PlaySound('win.wav', SND_FILENAME)
-loser = lambda: PlaySound('lose.wav', SND_FILENAME)
+correct = lambda: PlaySound('correct.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+wrong = lambda: PlaySound('wrong.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+winner = lambda: PlaySound('win.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+loser = lambda: PlaySound('lose.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
 
 titles = []
 pictures = []
@@ -52,11 +53,10 @@ for item in title:
 
 def update(ind, frames):
     global prozor, label
-
+    if ind >= len(frames):
+        return
     frame = frames[ind]
     ind += 1
-    if ind > len(frames):
-        return
     label.configure(image=frame)
     prozor.after(100, update, ind, frames)
 
@@ -77,8 +77,9 @@ def scraper(link):
 
 
 def restart():
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
+    global prozor
+    prozor.destroy()
+    os.system('python Vesanje.py')
 
 def win():
 
@@ -95,6 +96,7 @@ def win():
     linked_resenje.pack()
     linked_resenje.bind("<Button-1>", lambda e: callback(link))
     render = ImageTk.PhotoImage(img)
+    img.close()
     img = Label(novi_prozor, image = render,highlightthickness = 0, borderwidth = 0)
     img.image = render
     img.place(relx=0.4,rely=0.3)
@@ -193,12 +195,12 @@ def enter(e):
     listToStr = ' '.join(map(str, B))
     my_label.config(text = listToStr)
     if provera_greske == ''.join(map(str, B)):
-        wrong()
         num += 1
     if provera_greske != ''.join(map(str, B)):
         correct()
-    if num != 0:
+    elif num != 0:
         greska(greske[num])
+        wrong()
     if num == 7:
         lose()
     if A == B:
@@ -224,8 +226,11 @@ def enter1():
     my_label.config(text = listToStr)
     if provera_greske == ''.join(map(str, B)):
         num += 1
-    if num != 0:
+    if provera_greske != ''.join(map(str, B)):
+        correct()
+    elif num != 0:
         greska(greske[num])
+        wrong()
     if num == 7:
         lose()
     if A == B:
@@ -294,5 +299,6 @@ if __name__ == "__main__":
     label.place(relx = 0.9, rely = 0.01, anchor = NE)
     label.configure(highlightthickness = 0, borderwidth = 0)
     prozor.mainloop()
+
 
 os.remove(resenje + '.jpg')
