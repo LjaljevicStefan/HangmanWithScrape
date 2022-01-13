@@ -6,17 +6,20 @@ import os
 import bs4
 import requests
 import webbrowser
-
+import time
+from winsound import *
 # Images for hangman mistakes
-prva_greska = Image.open("prva greska.png")
-druga_greska = Image.open("druga greska.png")
-treca_greska = Image.open("treca greska.png")
-cetvrta_greska = Image.open("cetvrta greska.png")
-peta_greska = Image.open("peta greska.png")
-sesta_greska = Image.open("sesta greska.png")
-kraj = Image.open("kraj.png")
 
-greske = {1:prva_greska, 2:druga_greska, 3:treca_greska, 4:cetvrta_greska, 5:peta_greska, 6:sesta_greska, 7:kraj}
+def list_frame(slika):
+    file = Image.open(slika)
+    frameCnt = file.n_frames
+    frames = [PhotoImage(file=slika,format = 'gif -index %i' %(i)) for i in range(frameCnt)]
+    return frames
+
+correct = lambda: PlaySound('correct.wav', SND_FILENAME)
+wrong = lambda: PlaySound('wrong.wav', SND_FILENAME)
+winner = lambda: PlaySound('win.wav', SND_FILENAME)
+loser = lambda: PlaySound('lose.wav', SND_FILENAME)
 
 titles = []
 pictures = []
@@ -45,6 +48,25 @@ for item in title:
     imdb_links.append('https://www.imdb.com'+imdb['href'])
     i += 1
 
+
+
+def update(ind, frames):
+    global prozor, label
+
+    frame = frames[ind]
+    ind += 1
+    if ind > len(frames):
+        return
+    label.configure(image=frame)
+    prozor.after(100, update, ind, frames)
+
+def greska(frames):
+    global prozor, label
+
+    prozor.after(0, update, 0, frames)
+
+
+
 def scraper(link):
 
     headers = {"Accept-Language": "en-US,en;q=0.5"}
@@ -63,6 +85,7 @@ def win():
     global img
     global link
 
+    winner()
     novi_prozor = Toplevel(prozor)
     novi_prozor.title("Pobeda")
     novi_prozor.geometry("450x450")
@@ -84,6 +107,7 @@ def lose():
     global img
     global link
 
+    loser()
     novi_prozor = Toplevel(prozor)
     novi_prozor.title("Poraz")
     novi_prozor.geometry("450x450")
@@ -146,11 +170,7 @@ for a in resenje:
 listToStr = ' '.join(map(str, B))
 
 
-def greska(slika):
-    render = ImageTk.PhotoImage(slika)
-    img = Label(prozor, image = render,highlightthickness = 0, borderwidth = 0)
-    img.image = render
-    img.place(relx=0.8, rely=0.1)
+
 
 num = 0
 
@@ -173,14 +193,17 @@ def enter(e):
     listToStr = ' '.join(map(str, B))
     my_label.config(text = listToStr)
     if provera_greske == ''.join(map(str, B)):
+        wrong()
         num += 1
+    if provera_greske != ''.join(map(str, B)):
+        correct()
     if num != 0:
         greska(greske[num])
     if num == 7:
         lose()
     if A == B:
         win()
-
+    
 def enter1():
     global listToStr
     global num
@@ -207,7 +230,6 @@ def enter1():
         lose()
     if A == B:
         win()
-
 #Driver code
 if __name__ == "__main__":
 
@@ -221,8 +243,16 @@ if __name__ == "__main__":
     prozor.title("Vesanje")
 
     #postavljanje dimenzija prozora
-    prozor.geometry("1280x720")
+    prozor.geometry("1600x800")
 
+    prva_greska = list_frame("prva greska.gif")
+    druga_greska = list_frame("druga greska.gif")
+    treca_greska = list_frame("treca greska.gif")
+    cetvrta_greska = list_frame("cetvrta greska.gif")
+    peta_greska = list_frame("peta greska.gif")
+    sesta_greska = list_frame("sesta greska.gif")
+    kraj = list_frame("kraj.gif")
+    greske = {1:prva_greska, 2:druga_greska, 3:treca_greska, 4:cetvrta_greska, 5:peta_greska, 6:sesta_greska, 7:kraj}
     #StringVar() je klasa varijabli
     #kreiranje objekta iz klase StringVar()
     S = StringVar()  #!!!
@@ -260,6 +290,9 @@ if __name__ == "__main__":
 
 
 #pokreni graficki interfejs
+    label = Label(prozor)
+    label.place(relx = 0.9, rely = 0.01, anchor = NE)
+    label.configure(highlightthickness = 0, borderwidth = 0)
     prozor.mainloop()
 
 os.remove(resenje + '.jpg')
