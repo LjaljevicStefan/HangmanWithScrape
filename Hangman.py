@@ -1,13 +1,12 @@
-from tkinter import *
-import winsound
+from tkinter import Toplevel, PhotoImage, Button, Label, StringVar, Tk, Entry, CENTER, SE, NW, NE
 from PIL import Image, ImageTk
 import random
 import os
 import bs4
 import requests
 import webbrowser
-from winsound import *
-
+import winsound
+from winsound import PlaySound
 # Lists for storing scraped data
 titles = []
 pictures = []
@@ -23,10 +22,10 @@ sci_fi = "https://www.imdb.com/search/title/?genres=sci_fi&sort=user_rating,desc
 crime = "https://www.imdb.com/search/title/?genres=crime&sort=user_rating,desc&title_type=feature&num_votes=25000,&pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=5aab685f-35eb-40f3-95f7-c53f09d542c3&pf_rd_r=PNVVBPMXD7B04F1VJ7W2&pf_rd_s=right-6&pf_rd_t=15506&pf_rd_i=top&ref_=chttp_gnr_6"
 
 # Sounds for the game
-correct = lambda: PlaySound('correct.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
-wrong = lambda: PlaySound('wrong.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
-winner = lambda: PlaySound('win.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
-loser = lambda: PlaySound('lose.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+correct = lambda: PlaySound('Sounds/correct.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+wrong = lambda: PlaySound('Sounds/wrong.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+winner = lambda: PlaySound('Sounds/win.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
+loser = lambda: PlaySound('Sounds/lose.wav', winsound.SND_ASYNC | winsound.SND_ALIAS)
 
 # On game running, using bs4 module and lxml library to handle html code
 f = open('scrape.txt','r')
@@ -49,11 +48,11 @@ for item in title:
 # On start of program, generate random title from titles list and that title is the solution of hangman
 solution = random.choice(titles)
 link = imdb_links[titles.index(solution)]                        # Using indexing to get link of the movie, which is shown on the end of the game
-img_link = requests.get(pictures[titles.index(solution)])        # Using indexing to get picture link of particular movie and scraping that image from web page
-img_file = open(solution + '.jpg','wb')
+img_link = requests.get(pictures[titles.index(solution)])        # Using indexing to get picture link of particular movie title and scraping that image from web page
+img_file = open('cover.jpg','wb')
 img_file.write(img_link.content)                                 # Writing image in binary to the variable
 img_file.close()
-img = Image.open(solution + '.jpg')                              # Using Image libray to assign actual picture to variable
+img = Image.open('cover.jpg')                                    # Using Image libray to assign actual picture to variable
 
 A = []                                                           # Creating two lists, one for correct letters, and other for guessing
 B = []
@@ -127,9 +126,9 @@ def win_lose(status_title, message, sound):
     linked_solution.bind("<Button-1>", lambda e: callback(link))                                               # Binding title of movie (linking), and assining function for opening browser and showing movie on imdb
     render = ImageTk.PhotoImage(img)                                                                           # Assining cover picture of the movie to variable
     img.close()
-    img = Label(new_window, image = render,highlightthickness = 0, borderwidth = 0)                            # Positioning picture in the window
-    img.image = render
-    img.place(relx=0.4,rely=0.3)
+    img_label = Label(new_window, image = render,highlightthickness = 0, borderwidth = 0)                      # Positioning picture in the window
+    img_label.image = render
+    img_label.place(relx=0.4,rely=0.3)
 
 def callback(url):
 # Function for opening browser
@@ -180,7 +179,7 @@ def entry():
     guess = S.get()                                                    # Assigning letter from entry box to variable(guess)
 
     for slovo in A:                                                    # Checking if there is a letter match and swaping underscore with correct letter
-        if slovo.lower() == guess:
+        if slovo.lower() == guess.lower():
             B.pop(k)
             B.insert(k,slovo)
             k += 1
@@ -225,13 +224,13 @@ if __name__ == "__main__":
     window.geometry("1400x800")
 
     # Using list_frame func for mistake gifs and assign each mistake to variable
-    first_mistake = list_frame("first mistake.gif")
-    second_mistake = list_frame("second mistake.gif")
-    third_mistake = list_frame("third mistake.gif")
-    fourth_mistake = list_frame("fourth mistake.gif")
-    fifth_mistake = list_frame("fifth mistake.gif")
-    sixth_mistake = list_frame("sixth mistake.gif")
-    last_mistake = list_frame("last mistake.gif")
+    first_mistake = list_frame("Images/first mistake.gif")
+    second_mistake = list_frame("Images/second mistake.gif")
+    third_mistake = list_frame("Images/third mistake.gif")
+    fourth_mistake = list_frame("Images/fourth mistake.gif")
+    fifth_mistake = list_frame("Images/fifth mistake.gif")
+    sixth_mistake = list_frame("Images/sixth mistake.gif")
+    last_mistake = list_frame("Images/last mistake.gif")
 
     # Creating dictionary for mistake variables, to be used as argument in mistake func
     mistakes = {1:first_mistake, 2:second_mistake, 3:third_mistake, 4:fourth_mistake, 5:fifth_mistake, 6:sixth_mistake, 7:last_mistake}
@@ -288,4 +287,5 @@ if __name__ == "__main__":
     window.mainloop()
 
 # Deleting temp files(cover image for movie)
-os.remove(solution + '.jpg')
+img.close()
+os.remove('cover.jpg')
