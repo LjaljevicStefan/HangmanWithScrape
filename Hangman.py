@@ -98,7 +98,7 @@ def scraper(link):                                          # Argument is link o
 
     headers = {"Accept-Language": "en-US,en;q=0.5"}         # Language for movie titles
     res = requests.get(link,headers=headers)                # Requesting and getting web page from imdb
-    f = open('scrape.txt','w')                              
+    f = open('scrape.txt', 'w', encoding='utf-8')                              
     f.write(res.text)                                       # Writing web page to scrape.txt file
     f.close()
 
@@ -107,7 +107,7 @@ def restart():
 
     global window
     window.destroy()
-    os.system('python Vesanje.py')
+    os.system('python Hangman.py')
 
 def win_lose(status_title, message, sound):
 # Pop-up window when you win with restart button
